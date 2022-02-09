@@ -1,6 +1,10 @@
 const router = require('express').Router();
-const api = require('./api');
+const {
 
-router.use('/api', api);
+} = require('../../controllers/thoughtsController');
+
+
+
+
 
 module.exports = router;
