@@ -1,7 +1,8 @@
 const { User, Thoughts } = require('../models');
 
-const getThoughts = (req, res) => {
-    Thought.find()
+module.exports = {
+getThoughts(req, res) {
+    Thoughts.find()
         .then(async (thoughts) => {
             const thoughtObj = {
                 thoughts,
@@ -13,11 +14,9 @@ const getThoughts = (req, res) => {
             console.log(err);
             return res.status(500).json(err);
         });
-};
-
-
-const getSingleThought = (req, res) => {
-    Thought.findOne({ _id: req.params.thoughtId })
+},
+getSingleThought(req, res) {
+    Thoughts.findOne({ _id: req.params.thoughtId })
         .select('-__v')
         .then(async (thought) =>
             !thought
@@ -31,17 +30,14 @@ const getSingleThought = (req, res) => {
             console.log(err);
             return res.status(500).json(err);
         });
-};
-
-
-const createThought = (req, res) => {
-    Thought.create(req.body)
+},
+createThought(req, res) {
+    Thoughts.create(req.body)
         .then((thought) => res.json(thought))
         .catch((err) => res.status(500).json(err));
-};
-
-const updateThought = (req, res) => {
-    Thought.findOneAndUpdate(
+},
+updateThought(req, res) {
+    Thoughts.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $set: req.body },
         { runValidators: true, new: true }
@@ -52,15 +48,13 @@ const updateThought = (req, res) => {
                 : res.json(thought)
         )
         .catch((err) => res.status(500).json(err));
-}
-
-
-const deleteThought = (req, res) => {
+},
+deleteThought(req, res) {
     Thought.findOneAndRemove({ _id: req.params.thoughtId })
         .then((thought) =>
             !thought
                 ? res.status(404).json({ message: 'No such thought exists' })
-                : thought.findOneAndUpdate(
+                : Thoughts.findOneAndUpdate(
                     { thoughts: req.params.thoughtId },
                     { $pull: { thoughts: req.params.thoughtId } },
                     { new: true }
@@ -77,12 +71,10 @@ const deleteThought = (req, res) => {
             console.log(err);
             res.status(500).json(err);
         });
-}
-
-
-const createReaction = (req, res) => {
+},
+createReaction(req, res) {
     console.log(req.body);
-    Thought.findOneAndUpdate(
+    Thoughts.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $addToSet: { reactions: req.body } },
         { runValidators: true, new: true }
@@ -95,10 +87,9 @@ const createReaction = (req, res) => {
                 : res.json(thought)
         )
         .catch((err) => res.status(500).json(err));
-}
-
-const deleteReaction = (req, res) => {
-    thought.findOneAndUpdate(
+},
+deleteReaction(req, res) {
+    Thoughts.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $pull: { reactions: { reactionId: req.params.assignmentId } } },
         { runValidators: true, new: true }
@@ -111,14 +102,5 @@ const deleteReaction = (req, res) => {
                 : res.json(thought)
         )
         .catch((err) => res.status(500).json(err));
-}
-
-module.exports = {
-    getThoughts,
-    getSingleThought,
-    createThought,
-    updateThought,
-    deleteThought,
-    createReaction,
-    deleteReaction,
-}
+},
+};
