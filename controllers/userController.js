@@ -40,7 +40,19 @@ const createUser = (req, res) => {
         .catch((err) => res.status(500).json(err));
 };
 
-// Update User
+const updateUser = (req, res) => {
+    User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $set: req.body },
+        { runValidators: true, new: true }
+    )
+        .then((user) =>
+            !user
+                ? res.status(404).json({ message: 'No user with this id' })
+                : res.json(user)
+        )
+        .catch((err) => res.status(500).json(err));
+}
 
 
 const deleteUser = (req, res) => {
@@ -72,7 +84,7 @@ const addFriend = (req, res) => {
     console.log(req.body);
     User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $addToSet: { assignments: req.body } },
+        { $addToSet: { friends: req.body } },
         { runValidators: true, new: true }
     )
         .then((user) =>
@@ -88,7 +100,7 @@ const addFriend = (req, res) => {
 const deleteFriend = (req, res) => {
     User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $pull: { assignment: { assignmentId: req.params.assignmentId } } },
+        { $pull: { friends: { friendId: req.params.assignmentId } } },
         { runValidators: true, new: true }
     )
         .then((user) =>
@@ -102,11 +114,11 @@ const deleteFriend = (req, res) => {
 }
 
 module.exports = {
-    getUsers, 
+    getUsers,
     getSingleUser,
     createUser,
     updateUser,
     deleteUser,
     addFriend,
-    deleteFriend, 
+    deleteFriend,
 }
