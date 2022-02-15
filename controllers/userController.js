@@ -1,12 +1,18 @@
-const { User, Thoughts } = require('../models/');
+const User = require('../models/User');
 
-module.exports = {
+console.log("Loading User controller"); 
+
+const userController = {
     getUsers(req, res) {
+        console.log("hello user", req);
         User.find()
+            // .populate({path: 'thoughts', select: '-__v'})
+            // .populate({path: 'friends', select: '-__v'})
+            .select('-__v')
             .then(async (users) => {
                 const userObj = {
                     users,
-                    headCount: await headCount(),
+                    friendCount: await friendCount(),
                 };
                 return res.json(userObj);
             })
@@ -18,13 +24,10 @@ module.exports = {
     getSingleUser(req, res) {
         User.findOne({ _id: req.params.userId })
             .select('-__v')
-            .then(async (user) =>
+            .then((user) =>
                 !user
                     ? res.status(404).json({ message: 'No user with that ID' })
-                    : res.json({
-                        user,
-                        grade: await grade(req.params.userId),
-                    })
+                    : res.json(user)
             )
             .catch((err) => {
                 console.log(err);
@@ -32,6 +35,7 @@ module.exports = {
             });
     },
     createUser(req, res) {
+        console.log("Adding a new user ...")
         User.create(req.body)
             .then((user) => res.json(user))
             .catch((err) => res.status(500).json(err));
@@ -104,3 +108,5 @@ module.exports = {
             .catch((err) => res.status(500).json(err));
     },
 };
+
+module.exports = userController; 

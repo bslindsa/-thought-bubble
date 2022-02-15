@@ -1,8 +1,10 @@
-const { User, Thoughts } = require('../models');
+const { User, Thought } = require('../models');
+
+console.log("Loading thoughts controller"); 
 
 module.exports = {
 getThoughts(req, res) {
-    Thoughts.find()
+    Thought.find()
         .then(async (thoughts) => {
             const thoughtObj = {
                 thoughts,
@@ -16,7 +18,7 @@ getThoughts(req, res) {
         });
 },
 getSingleThought(req, res) {
-    Thoughts.findOne({ _id: req.params.thoughtId })
+    Thought.findOne({ _id: req.params.thoughtId })
         .select('-__v')
         .then(async (thought) =>
             !thought
@@ -32,12 +34,12 @@ getSingleThought(req, res) {
         });
 },
 createThought(req, res) {
-    Thoughts.create(req.body)
+    Thought.create(req.body)
         .then((thought) => res.json(thought))
         .catch((err) => res.status(500).json(err));
 },
 updateThought(req, res) {
-    Thoughts.findOneAndUpdate(
+    Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $set: req.body },
         { runValidators: true, new: true }
@@ -74,7 +76,7 @@ deleteThought(req, res) {
 },
 createReaction(req, res) {
     console.log(req.body);
-    Thoughts.findOneAndUpdate(
+    Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $addToSet: { reactions: req.body } },
         { runValidators: true, new: true }
@@ -89,7 +91,7 @@ createReaction(req, res) {
         .catch((err) => res.status(500).json(err));
 },
 deleteReaction(req, res) {
-    Thoughts.findOneAndUpdate(
+    Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $pull: { reactions: { reactionId: req.params.assignmentId } } },
         { runValidators: true, new: true }
